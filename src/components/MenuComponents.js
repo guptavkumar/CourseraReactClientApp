@@ -1,79 +1,53 @@
-import React, { Component } from 'react';
-import {  Card, CardImg, CardText, CardImgOverlay, CardTitle,CardBody }  from 'reactstrap';
+import React from 'react';
+import {  Card, CardImg, CardText, CardImgOverlay, CardTitle,CardBody, Breadcrumb, BreadcrumbItem}  from 'reactstrap';
 import { DISHES } from '../shared/dishes';
+import {Link} from 'react-router-dom';
 
-class Menu extends Component {
 
-    constructor(props)
-    {
-        super(props);
+
+
+  function RenderMenuItems ({dish, onClick})
+  {
+      return(
+        <Card >
+          <Link to = {`/menu/${dish.id}`}>
+           <CardImg width="100%" object src= {dish.image} alt={dish.alt} />
+           <CardImgOverlay>
+               <CardTitle tag="h5">{dish.name}</CardTitle>
+            </CardImgOverlay>
+            </Link>
+    </Card>
+      );
     
-   this.state = { 
-       selectedish:  null
-     }
-    }
-
-    onDishSelection(dish)
-    {
-        
-        this.setState({ selectedish : dish }, () => {
-            console.log(this.state.selectedish, 'selecte Dish');
-          });
-       
-    }
-
-    renderDish(dish) {
-        
-        if (dish != null)
-        {
-            return(
-                <Card>
-                    <CardImg top src={dish.image} alt={dish.name} />
-                    <CardBody>
-                      <CardTitle>{dish.name}</CardTitle>
-                      <CardText>{dish.description}</CardText>
-                    </CardBody>
-                </Card>
-            );
-        }
-        else
-        {
-            console.log("selected item is still null");
-            return(
-                <div></div>
-            );
-        }
-    }
-
-
-    render() { 
-       const menu = this.props.dishes.map((dish)=>
+  }
+    const Menu = (props)=> { 
+    
+        const menu = props.dishes.map((dish)=>
        {
            return(
              <div key={dish.id} className="col-12 col-md-5 m-1">
-                 <Card onClick={()=>this.onDishSelection(dish)}>
-                   
-                        <CardImg width="100%" object src= {dish.image} alt={dish.alt} />
-                        <CardImgOverlay>
-                            <CardTitle tag="h5">{dish.name}</CardTitle>
-                        </CardImgOverlay>
-                  </Card>
+                <RenderMenuItems dish={dish} onClick={props.onClick}/>
              </div>
            );
        });
 
        return(
            <div className="container">
+               <div className="row">
+                 <Breadcrumb>
+                 <BreadcrumbItem><Link to="/home">Home</Link></BreadcrumbItem>
+                 <BreadcrumbItem active>Menu</BreadcrumbItem>
+                 </Breadcrumb>
+                 </div>
                  <div className="row">
                       {menu}
                     
                  </div>
-                 <div className="row">
-                    {this.renderDish(this.state.selectedish)}
-                 </div>
+                 
+                
            </div>
        );
     }
-}
+
  
 export default Menu;

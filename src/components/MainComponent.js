@@ -7,6 +7,7 @@ import DishDetailsComponent from '../components/DishDetailsComponent';
 import Header from './HeaderComponent';
 import Footer from './FooterComponent';
 import Home from './HomeComponent';
+import About from './AboutComponent';
 import {Switch, Route, Redirect, BrowserRouter} from 'react-router-dom';
 import Contact from './ContactComponent';
 import { COMMENTS } from '../shared/comments';
@@ -51,7 +52,8 @@ constructor(props)
         <Header />
         
         <Switch>
-          <Route path = '/home' component={HomePage} />
+           <Route path = '/home' component={HomePage} />
+           <Route path = '/aboutus' component={()=> <About leaders ={this.state.leaders}/>} />
           <Route exact path='/menu' component={()=> <Menu dishes={this.state.dishes} />}/>
           <Route path='/menu/:dishId' component={DishDetails}/>
           <Route exact path='/contactus' component={Contact} />

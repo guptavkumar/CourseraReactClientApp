@@ -4,89 +4,34 @@ import {Link} from 'react-router-dom';
 import {LocalForm,Control,Errors} from 'react-redux-form';
 
 
+const required = (val)=> val && val.length;
+const maxLength = (len) => (val) => !(val) || (val.length <=len);
+const minLength = (len) => (val) => val && (val.length>=len);
+const isNumber = (val)=> !isNaN(Number(val));
+const minLengthMessage = ' : Must be greater than 2 characters';
+const maxLengthMessage = ' : Must be 15 characters or less';
+const validEmail = (val)=>/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(val);
+
 class Contact extends Component
 {
     constructor(props)
     {
         super(props);
-        this.state ={
-            firstname:'',
-            lastname:'',
-            telnum:'',
-            email:'',
-            agree:false,
-            contactType:'Tel',
-            message:'',
-            touched:{
-                firstname:false,
-                lastname:false,
-                telnum:false,
-                email:false
-            }
-        };
-
-        this.handelInputChangeEvent = this.handelInputChangeEvent.bind(this);
-        this.handelSubmitbuttonEvent = this.handelSubmitbuttonEvent.bind(this);
-        this.handleBlur = this.handleBlur.bind(this);
+       
+       // this.handelSubmitbuttonEvent = this.handelSubmitbuttonEvent.bind(this);
+       
     }
 
-    handleBlur = (field) => (evt) => {
-        this.setState({
-            touched: {[field]: true }
-        });
-        console.log("comes inside Blur");
+
+   handleSubmit(values) {
+        console.log('Current State is: ' + JSON.stringify(values));
+        alert('Current State is: ' + JSON.stringify(values));
+        // event.preventDefault();
     }
 
-    handelInputChangeEvent(event)
-    {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked :target.value;
-        const name = target.name;
-
-        this.setState({[name]:value});
-    }
-
-    handelSubmitbuttonEvent(event)
-    {
-        console.log('The current state is: ' + JSON.stringify(this.state));
-        alert('Current state is: '+ JSON.stringify(this.state));
-        event.preventDefault();
-    }
-
-    validate(firstname, lastname,telnum,email)
-    {
-        const errors = {
-            firstname:'',
-            lastname:'',
-            telnum:'',
-            email:''
-        };
-
-        if(this.state.touched.firstname && firstname.length <3)
-        {
-            errors.firstname ="First nane should be greater than 3 characters"
-            console.log("first name has error");
-        }
-        
-        if(this.state.touched.lastname && lastname.length <3)
-        {
-            errors.lastname ="Last nane should be greater than 3 characters"
-            
-        }
-        if(this.state.touched.email && email.split('').filter(x=>x =='@').length !=1)
-        {
-            errors.email ="Please enter a valid email attress. It should have @"
-            
-        }
-        const reg = /^\d+$/;
-        if (this.state.touched.telnum && !reg.test(telnum))
-            errors.telnum = 'Tel. Number should contain only numbers';
-        return errors;
-
-    }
     render()
     {
-        const errors = this.validate(this.state.firstname,this.state.lastname,this.state.telnum,this.state.email);
+    
         return(
             <div className="container">
                  <div className="row">
@@ -132,37 +77,77 @@ class Contact extends Component
                         <h3>Send us your feedback</h3>
                     </div>
                     <div className="col-12 col-md-9">
-                        <LocalForm onSubmit={this.handelSubmitbuttonEvent}>
+                        <LocalForm onSubmit={(values) => this.handelSubmitbuttonEvent(values)}>
                             <Row className="form-group">
                                 <Label htmlFor="firstname" md={2}>First Name</Label>
                                 <Col md={10}>
-                                    <Control.text className="form-control" model=".firstname" name="firstname" placeholder="Enter First name here" value={this.state.firstname} />
+                                    <Control.text className="form-control" model=".firstname" id="firstname" name="firstname" placeholder="Enter First name here"
+                                    validators={{required,minLength:minLength(3), maxLength:maxLength(15)}}  />
+
+                                    <Errors className="text-danger"
+                                    model=".firstname"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Required',
+                                        minLength:minLengthMessage,
+                                        maxLength:maxLengthMessage
+                                    }}
+                                    />
                                 </Col>
                             </Row>
 
                             <Row className="form-group">
                                 <Label htmlFor="lastname" md={2}> Last Name</Label>
                                 <Col md={10}>
-                                <Control.text className="form-control" model=".lastname" name="lastname" placeholder="Enter last name here" value={this.state.lastname} />
+                                <Control.text className="form-control" model=".lastname" name="lastname" placeholder="Enter last name here" 
+                                 validators={{required, maxLength:maxLength(15),minLength:minLength(3)}} /> 
+                                 <Errors className="text-danger"
+                                 model=".lastname"
+                                 show="touched"
+                                 messages={{
+                                     required: 'Required',
+                                     minLength:minLengthMessage,
+                                     maxLength:maxLengthMessage
+                                 }}
+                                 />
+                                 
                                 </Col>
                             </Row>
 
                             <Row className="from-group">
                             <Label htmlFor="telnum" md={2}>Contact Tel.</Label>
                                 <Col md={10}>
-                                    <Control.text className="form-control" id="telnum" name="telnum"
+                                    <Control.text className="form-control" model=".telnum" id="telnum" name="telnum"
                                         placeholder="Tel. number"
-                                        value={this.state.telnum}
+                                        validators={{required,minLength:minLength(3), maxLength:maxLength(15),isNumber}}
                                         />
-                                     
+                                 <Errors className="text-danger"
+                                 model=".telnum"
+                                 show="touched"
+                                 messages={{
+                                     required: 'Required',
+                                     minLength:minLengthMessage,
+                                     maxLength:maxLengthMessage,
+                                     isNumber:'Must be a Number'
+                                 }}
+                                 />     
                                 </Col>
                             </Row>
 
                             <Row className="form-group">
                             <Label htmlFor="email" md={2} >Email</Label>
                                 <Col md={10}>
-                                <Control.text className="form-control" model=".email" name="email" placeholder="Email" value={this.state.email} 
+                                <Control.text className="form-control" model=".email" name="email" placeholder="Email"  
+                                  validators={{required, validEmail}}
                                     />
+                                     <Errors className="text-danger"
+                                 model=".email"
+                                 show="touched"
+                                 messages={{
+                                     required: 'Required',
+                                     validEmail:'Invalid Email Address'
+                                 }}
+                                 /> 
                                 </Col>
                                 
                             </Row>
@@ -171,14 +156,14 @@ class Contact extends Component
                             <Col md={{size:6,offset:2}}>
                                 <div className="form-check">
                                     <Label check>
-                                        <Control.checkbox className="form-control" model=".agree" name="agree" checked={this.state.agree} 
+                                        <Control.checkbox className="form-control" model=".agree" name="agree"  
                                             /> {' '}
                                         <strong>May we contact you ?</strong>
                                     </Label>
                                 </div>
                             </Col>
                             <Col md={{size:3, offset:1}}>
-                                <Control.select  className="form-control" model=".contactType" name="contacttype" value={this.state.contactType}>
+                                <Control.select  className="form-control" model=".contactType" name="contacttype">
                                 
                                     <option>Tel.</option>
                                     <option>Email</option>
@@ -191,7 +176,7 @@ class Contact extends Component
                                 <Col md={10}>
                                     <Control.textarea  className="form-control" model=".message" id="message" name="message"
                                         rows="12"
-                                        value={this.state.message}
+                                        
                                         />
                                 </Col>
                             </Row>

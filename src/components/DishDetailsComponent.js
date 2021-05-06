@@ -3,7 +3,8 @@ import { Control,LocalForm , Errors} from 'react-redux-form';
 
 import {Link} from 'react-router-dom';
 import React, { Component } from 'react';
-//import CommentForm from './CommentForm';
+import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
 
 
 const maxLength = (len) => (val) => !(val) || (val.length <=len);
@@ -22,6 +23,14 @@ class CommentForm extends Component {
         console.log("Submit Button Clicked");
      }
 
+     hanleSubmit (value){
+        this.ToggleModel();
+        //alert('Current State is: ' + JSON.stringify(value));
+        this.props.postComment(this.props.dishId, value.rating, value.author,value.comment);
+        
+        console.log("Add comment triggered with comment : "+this.props.dishId +' '+ value.rating+ ' ' + value.author + ' '+ value.comment);
+        console.log("Add comment triggered with comment : "+JSON.stringify(value));
+     }
     render() { 
         return (  
             <>
@@ -38,7 +47,7 @@ class CommentForm extends Component {
                         <Row className="form-group">
                             <Col>
                                 <Label htmlFor="rating"> Rating</Label>
-                                <Control.select model=".rating" className="form-control">
+                                <Control.select model=".rating" id ="rating" className="form-control">
                                     <option>1</option>
                                     <option>2</option>
                                     <option>3</option>
@@ -81,9 +90,29 @@ class CommentForm extends Component {
     }
 }
    
-    function RenderComments({comments})
+    function RenderComments({comments,postComment,dishId,isLoading, errMsg})
     {
-       
+       console.log("Comments Error "+comments.length);
+        if(isLoading)    
+        {
+            return(
+                <div className="container">
+                    <div className="row">            
+                        <Loading />
+                    </div>
+                </div>
+            );
+        }else if(errMsg)
+        {
+            return(
+                <div className="container">
+                    <div className="row">            
+                        <h4>{errMsg}</h4>
+                    </div>
+                </div>
+            );
+        }else  
+
        if(comments !=null)
         {
            const commentlist= comments.map((comment)=>
@@ -114,31 +143,49 @@ class CommentForm extends Component {
             <div   className="col-12 col-md-5 m-1">  
                     <h4>Comments</h4>
                     {commentlist}
-                    <CommentForm />
+                    <CommentForm dishId={dishId} postComment={postComment}/>
             </div>
         );
         }
         else{
-            return(<div></div>);
+            return(<div>
+                </div>);
         }
         
      
        
     }
 
-    function RenderDish({dish}) {
+    function RenderDish(props) {
         
-    
-        if (dish != null)
+        if(props.isLoading)    
+        {
+            return(
+                <div className="container">
+                    <div className="row">            
+                        <Loading />
+                    </div>
+                </div>
+            );
+        }else if(props.ErrMsg)
+        {
+            return(
+                <div className="container">
+                    <div className="row">            
+                        <h4>{props.errMsg}</h4>
+                    </div>
+                </div>
+            );
+        }else   if (props.dish != null)
         {
           
             return(
-                <div key={dish.id} className="col-12 col-md-5 m-1">
+                <div key={props.dish.id} className="col-12 col-md-5 m-1">
                 <Card>
-                    <CardImg top src={dish.image} alt={dish.name} />
+                    <CardImg top src={baseUrl+ props.dish.image} alt={props.dish.name} />
                     <CardBody>
-                      <CardTitle>{dish.name}</CardTitle>
-                      <CardText>{dish.description}</CardText>
+                      <CardTitle>{props.dish.name}</CardTitle>
+                      <CardText>{props.dish.description}</CardText>
                     </CardBody>
                 </Card>
                 </div>
@@ -155,7 +202,25 @@ class CommentForm extends Component {
 
   const DishDetailsComponent = (props) =>{ 
 
-        if(props.selectedDishFromMenu !=null)
+    if(props.isLoading)    
+    {
+        return(
+            <div className="container">
+                <div className="row">            
+                    <Loading />
+                </div>
+            </div>
+        );
+    }else if(props.ErrMsg)
+    {
+        return(
+            <div className="container">
+                <div className="row">            
+                    <h4>{props.errMsg}</h4>
+                </div>
+            </div>
+        );
+    }else if(props.selectedDishFromMenu !=null)
         {
             return (
             
@@ -176,8 +241,11 @@ class CommentForm extends Component {
                          </div>
 
                          <div className="row">
-                            <RenderDish dish={props.selectedDishFromMenu} />
-                            <RenderComments comments={props.comments} />
+                            <RenderDish dish={props.selectedDishFromMenu}  />
+                            <RenderComments comments={props.comments} 
+                            postComment ={props.postComment}
+                            dishId={props.selectedDishFromMenu.id}
+                            isLoading={props.commentsLoading} errMsg={props.errMsgComments}/>
                                         
                         </div>
   

@@ -4,6 +4,7 @@ import { Card, CardImg, CardText, CardBody,
 import { Loading } from './LoadingComponent';
 import {baseUrl} from '../shared/baseUrl';
 
+import {FadeTransform} from 'react-animation-components';
 function RenderCard({item,isLoading,errMsg}) {
 if(isLoading)
 {
@@ -13,9 +14,17 @@ if(isLoading)
 }else if(errMsg)
 {
     <h4>errMsg </h4>
-}else
-console.log("image item " + baseUrl+ item.image);
+}else if(item === undefined)
+ {
+     return(<div></div>);
+ }
+ else{
+
     return(
+        <FadeTransform in 
+        transformProps={{
+            exitTransform: 'scale(0.5) translateY(-50%)'
+        }}>
         <Card>
             <CardImg src={baseUrl+ item.image} alt={item.name} />
             <CardBody>
@@ -24,11 +33,13 @@ console.log("image item " + baseUrl+ item.image);
             <CardText>{item.description}</CardText>
             </CardBody>
         </Card>
+        </FadeTransform>
     );
-
+    }
 }
 
 function Home(props) {
+
     return(
         <div className="container">
             <div className="row align-items-start">
@@ -43,7 +54,9 @@ function Home(props) {
                      errMsg={props.promoErrMsg}  />
                 </div>
                 <div className="col-12 col-md m-1">
-                    <RenderCard item={props.leader} />
+                <RenderCard item={props.leader}
+                     isLoading={props.leadersLoading}
+                     errMsg={props.leadersErrmsg}  />
                 </div>
             </div>
         </div>

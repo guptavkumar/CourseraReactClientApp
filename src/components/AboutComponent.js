@@ -1,15 +1,27 @@
 import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardHeader, Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import {Loading} from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
 
-function RenderLeader({leaders})
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
+
+
+function RenderLeader({leaders,isLoading,errMsg})
 {
     
     const leaderInfo = leaders.map((leader) => {
+      
         return (
+            <FadeTransform
+            in
+            transformProps={{
+                exitTransform: 'scale(0.5) translateY(-50%)'
+            }}> 
+         <Fade in>
             <Media className="mt-5">
                 <Media>
-                     <Media img src={leader.image} className="d-flex mr-3 img-thumbnail" alt={leader.name} />
+                     <Media img src={baseUrl+ leader.image} className="d-flex mr-3 img-thumbnail" alt={leader.name} />
                 </Media>
                 <Media body>
                     <Media heading>
@@ -19,17 +31,31 @@ function RenderLeader({leaders})
                      {leader.description}
                 </Media>
           </Media>
-      
+          </Fade>
+          </FadeTransform>
         );
+       
     });
-
+    
+    if(isLoading)
+    {
+        return(
+            <Loading/>
+        );
+    }else if(errMsg)
+    {
+        <h4>errMsg </h4>
+    }else{
     return(
 
         <Media list>
+            <Stagger in>
         {leaderInfo}
+        </Stagger>
     </Media>
         
     );
+    }
 }
 
 function About(props) {
@@ -95,9 +121,15 @@ function About(props) {
                 <div className="col-12">
                     <h2>Corporate Leadership</h2>
                 </div>
+                <Fade in>
                 <div className="col-12 align-items-center">
-                    <RenderLeader leaders={props.leaders} />
+                    
+                <RenderLeader leaders={props.leaders.leaders}
+                                  isLoading={props.leaders.leadersisLoading}
+                                  ErrMsg={props.leaders.errMsg} />
+                                  
                 </div>
+                </Fade>
             </div>
         </div>
     );

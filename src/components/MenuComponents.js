@@ -44,7 +44,7 @@ import { Loading } from './LoadingComponent';
     
         const menu = props.dishes.dishes.map((dish)=>
        {
-         console.log("Is Loading Menu : " + props.dishes.isLoading);
+
         if (props.dishes.isLoading) {
           return(
               <div className="container">

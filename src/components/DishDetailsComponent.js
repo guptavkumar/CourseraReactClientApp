@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 import React, { Component } from 'react';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
-
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 const maxLength = (len) => (val) => !(val) || (val.length <=len);
 const minLength = (len) => (val) => val && (val.length>=len);
@@ -20,16 +20,14 @@ class CommentForm extends Component {
      ToggleModel =  ()=>
      {
         this.setState({isModelOpen: !this.state.isModelOpen});
-        console.log("Submit Button Clicked");
+
      }
 
      hanleSubmit (value){
         this.ToggleModel();
         //alert('Current State is: ' + JSON.stringify(value));
         this.props.postComment(this.props.dishId, value.rating, value.author,value.comment);
-        
-        console.log("Add comment triggered with comment : "+this.props.dishId +' '+ value.rating+ ' ' + value.author + ' '+ value.comment);
-        console.log("Add comment triggered with comment : "+JSON.stringify(value));
+     
      }
     render() { 
         return (  
@@ -92,7 +90,7 @@ class CommentForm extends Component {
    
     function RenderComments({comments,postComment,dishId,isLoading, errMsg})
     {
-       console.log("Comments Error "+comments.length);
+
         if(isLoading)    
         {
             return(
@@ -115,34 +113,38 @@ class CommentForm extends Component {
 
        if(comments !=null)
         {
+            
            const commentlist= comments.map((comment)=>
             {
                 return(
                 
-                    
+                    <Stagger in>
                     <ul key={comment.id} class = "list-unstyled">
-                   
+                   <Fade in>
                          <li>{comment.comment}</li>
                          <li>--{comment.author}, {new Intl.DateTimeFormat('en-US', { 
                 month: 'short', 
                 day: '2-digit',
                 year: 'numeric', 
             }).format(new Date(comment.date))}</li>
-                         
+                         </Fade>
                          
                      </ul>
-                     
+                     </Stagger>
                     
             );
 
                 
             }
+      
             );
             
         return(
             <div   className="col-12 col-md-5 m-1">  
                     <h4>Comments</h4>
+                 
                     {commentlist}
+            
                     <CommentForm dishId={dishId} postComment={postComment}/>
             </div>
         );
@@ -181,6 +183,12 @@ class CommentForm extends Component {
           
             return(
                 <div key={props.dish.id} className="col-12 col-md-5 m-1">
+                    <FadeTransform
+                in
+                transformProps={{
+                    exitTransform: 'scale(0.5) translateY(-50%)'
+                }}>
+                    
                 <Card>
                     <CardImg top src={baseUrl+ props.dish.image} alt={props.dish.name} />
                     <CardBody>
@@ -188,6 +196,7 @@ class CommentForm extends Component {
                       <CardText>{props.dish.description}</CardText>
                     </CardBody>
                 </Card>
+                </FadeTransform>
                 </div>
             );
         }
